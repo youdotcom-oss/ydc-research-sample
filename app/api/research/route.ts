@@ -1,6 +1,10 @@
 import { NextResponse } from "next/server";
+import { You } from "@youdotcom-oss/sdk";
 
 export const maxDuration = 60;
+
+const VALID_EFFORTS = ["lite", "standard", "deep", "exhaustive"] as const;
+type Effort = (typeof VALID_EFFORTS)[number];
 
 export async function POST(request: Request) {
   let input: unknown;
@@ -21,10 +25,10 @@ export async function POST(request: Request) {
     );
   }
 
-  const validEfforts = ["lite", "standard", "deep", "exhaustive"];
-  const effort =
-    typeof research_effort === "string" && validEfforts.includes(research_effort)
-      ? research_effort
+  const effort: Effort =
+    typeof research_effort === "string" &&
+    VALID_EFFORTS.includes(research_effort as Effort)
+      ? (research_effort as Effort)
       : "standard";
 
   const apiKey = process.env.YDC_API_KEY;
@@ -36,25 +40,13 @@ export async function POST(request: Request) {
   }
 
   try {
-    const res = await fetch("https://api.you.com/v1/research", {
-      method: "POST",
-      headers: {
-        "X-API-Key": apiKey,
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({ input, research_effort: effort }),
+    const you = new You({ apiKeyAuth: apiKey });
+    const result = await you.research({
+      input,
+      researchEffort: effort,
     });
 
-    if (!res.ok) {
-      const data = await res.json().catch(() => null);
-      return NextResponse.json(
-        { error: data?.message || "Research API request failed" },
-        { status: res.status },
-      );
-    }
-
-    const data = await res.json();
-    return NextResponse.json(data);
+    return NextResponse.json(result);
   } catch (err) {
     console.error("Research API error:", err);
     return NextResponse.json(
