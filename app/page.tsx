@@ -19,8 +19,18 @@ type ResearchResponse = {
 
 type Status = "idle" | "loading" | "done";
 
+const EFFORT_LEVELS = [
+  { value: "lite", label: "Lite", description: "Fast answers for simple questions" },
+  { value: "standard", label: "Standard", description: "Balanced speed and depth" },
+  { value: "deep", label: "Deep", description: "Thorough research and cross-referencing" },
+  { value: "exhaustive", label: "Exhaustive", description: "Most comprehensive analysis" },
+] as const;
+
+type Effort = (typeof EFFORT_LEVELS)[number]["value"];
+
 export default function Home() {
   const [query, setQuery] = useState("");
+  const [effort, setEffort] = useState<Effort>("standard");
   const [content, setContent] = useState("");
   const [sources, setSources] = useState<Source[]>([]);
   const [status, setStatus] = useState<Status>("idle");
@@ -46,7 +56,7 @@ export default function Home() {
       const res = await fetch("/api/research", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ input: q }),
+        body: JSON.stringify({ input: q, research_effort: effort }),
       });
 
       if (!res.ok) {
@@ -126,7 +136,7 @@ export default function Home() {
           <div className="rounded-xl border border-[#e7e8ec] bg-[#f9f9fb] px-5 py-4">
             <pre className="overflow-x-auto font-mono text-[13px] leading-5 text-[#4a4b57]">
               <code>{`you = You(api_key_auth="ydc-...")
-response = you.research(input="your question")
+response = you.research(input="your question", research_effort="deep")
 print(response.output.content)`}</code>
             </pre>
             <p className="mt-3 text-[12px] leading-4 text-[#81828c]">
@@ -174,6 +184,33 @@ print(response.output.content)`}</code>
               {status === "loading" ? "Researching..." : "Research"}
             </button>
           </form>
+
+          {/* Effort level selector */}
+          <div className="flex flex-col gap-2">
+            <p className="text-[13px] leading-4 text-[#81828c]">
+              Research depth
+            </p>
+            <div className="flex gap-2">
+              {EFFORT_LEVELS.map((level) => (
+                <button
+                  key={level.value}
+                  type="button"
+                  disabled={status === "loading"}
+                  onClick={() => setEffort(level.value)}
+                  title={level.description}
+                  className={[
+                    "rounded-full border px-3 py-1.5 text-[13px] leading-4 transition-colors",
+                    effort === level.value
+                      ? "border-[#101012] bg-[#101012] text-white"
+                      : "border-[#e7e8ec] text-[#4a4b57] hover:border-[#101012] hover:text-[#101012]",
+                    status === "loading" ? "opacity-40" : "",
+                  ].join(" ")}
+                >
+                  {level.label}
+                </button>
+              ))}
+            </div>
+          </div>
 
           {/* Example queries */}
           {status === "idle" && !error && (

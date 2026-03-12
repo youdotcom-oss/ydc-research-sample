@@ -4,8 +4,9 @@ export const maxDuration = 60;
 
 export async function POST(request: Request) {
   let input: unknown;
+  let research_effort: unknown;
   try {
-    ({ input } = await request.json());
+    ({ input, research_effort } = await request.json());
   } catch {
     return NextResponse.json(
       { error: "Invalid request body" },
@@ -20,6 +21,12 @@ export async function POST(request: Request) {
     );
   }
 
+  const validEfforts = ["lite", "standard", "deep", "exhaustive"];
+  const effort =
+    typeof research_effort === "string" && validEfforts.includes(research_effort)
+      ? research_effort
+      : "standard";
+
   const apiKey = process.env.YDC_API_KEY;
   if (!apiKey) {
     return NextResponse.json(
@@ -29,13 +36,13 @@ export async function POST(request: Request) {
   }
 
   try {
-    const res = await fetch("https://ydc-index.io/v1/research", {
+    const res = await fetch("https://api.you.com/v1/research", {
       method: "POST",
       headers: {
         "X-API-Key": apiKey,
         "Content-Type": "application/json",
       },
-      body: JSON.stringify({ input }),
+      body: JSON.stringify({ input, research_effort: effort }),
     });
 
     if (!res.ok) {

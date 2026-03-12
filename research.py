@@ -12,7 +12,8 @@ question = sys.argv[1] if len(sys.argv) > 1 else "What are the latest breakthrou
 you = You(api_key_auth=os.environ["YDC_API_KEY"])
 
 # run research — returns a markdown answer with inline citations
-response = you.research(input=question)
+# research_effort options: "lite", "standard", "deep", "exhaustive"
+response = you.research(input=question, research_effort="standard")
 
 # print the answer
 print(response.output.content)
