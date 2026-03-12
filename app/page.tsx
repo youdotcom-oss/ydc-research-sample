@@ -142,7 +142,7 @@ print(response.output.content)`}</code>
             <p className="mt-3 text-[12px] leading-4 text-[#81828c]">
               Powered by the{" "}
               <a
-                href="https://docs.you.com"
+                href="https://docs.you.com/api-reference/research/v1-research"
                 target="_blank"
                 rel="noopener noreferrer"
                 className="underline transition-colors hover:text-[#101012]"
