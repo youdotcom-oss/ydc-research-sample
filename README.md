@@ -1,5 +1,7 @@
 # Research
 
+**[Live demo →](https://ydc-research-sample.vercel.app/)**
+
 Ask a complex question, get a comprehensive cited answer from the [You.com Research API](https://docs.you.com).
 
 The Research API goes beyond a single web search. It runs multiple searches, reads through the sources, and synthesizes everything into a thorough, well-cited answer in Markdown.
