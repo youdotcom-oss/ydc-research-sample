@@ -3,7 +3,7 @@
 import os
 import sys
 
-from youdotcom import You
+from youdotcom import You, models
 
 # take question from command line, or use a default
 question = sys.argv[1] if len(sys.argv) > 1 else "What are the latest breakthroughs in quantum computing?"
@@ -12,8 +12,8 @@ question = sys.argv[1] if len(sys.argv) > 1 else "What are the latest breakthrou
 you = You(api_key_auth=os.environ["YDC_API_KEY"])
 
 # run research — returns a markdown answer with inline citations
-# research_effort options: "lite", "standard", "deep", "exhaustive"
-response = you.research(input=question, research_effort="standard")
+# options: LITE, STANDARD, DEEP, EXHAUSTIVE
+response = you.research(input=question, research_effort=models.ResearchEffort.STANDARD)
 
 # print the answer
 print(response.output.content)

@@ -2,7 +2,7 @@
 
 **[Live demo →](https://ydc-research-sample.vercel.app/)**
 
-Ask a complex question, get a comprehensive cited answer from the [You.com Research API](https://docs.you.com).
+Ask a complex question, get a comprehensive cited answer from the [You.com Research API](https://docs.you.com/api-reference/research/v1-research).
 
 The Research API goes beyond a single web search. It runs multiple searches, reads through the sources, and synthesizes everything into a thorough, well-cited Markdown answer. Think of it as having a research assistant that reads dozens of pages and writes you a report with footnotes.
 
@@ -139,7 +139,7 @@ app/
 ## Links
 
 - [You.com API docs](https://docs.you.com)
-- [Research API reference](https://docs.you.com/api-reference/research)
+- [Research API reference](https://docs.you.com/api-reference/research/v1-research)
 - [Python SDK](https://pypi.org/project/youdotcom/) (`pip install youdotcom`)
 - [TypeScript SDK](https://www.npmjs.com/package/@youdotcom-oss/sdk) (`npm install @youdotcom-oss/sdk`)
 - [Simple Search sample](https://github.com/youdotcom-oss/ydc-simple-search-sample)

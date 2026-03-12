@@ -166,11 +166,10 @@ print(response.output.content)`}</code>
                   onClick={() => setEffort(level.value)}
                   title={level.description}
                   className={[
-                    "rounded-full border px-3 py-1.5 text-[13px] leading-4 transition-colors",
+                    "rounded-full border px-3 py-1.5 text-[13px] leading-4 transition-colors disabled:opacity-40",
                     effort === level.value
                       ? "border-[#101012] bg-[#101012] text-white"
                       : "border-[#e7e8ec] text-[#4a4b57] hover:border-[#101012] hover:text-[#101012]",
-                    status === "loading" ? "opacity-40" : "",
                   ].join(" ")}
                 >
                   {level.label}
