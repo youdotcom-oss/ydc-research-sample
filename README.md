@@ -4,25 +4,87 @@
 
 Ask a complex question, get a comprehensive cited answer from the [You.com Research API](https://docs.you.com).
 
-The Research API goes beyond a single web search. It runs multiple searches, reads through the sources, and synthesizes everything into a thorough, well-cited answer in Markdown.
+The Research API goes beyond a single web search. It runs multiple searches, reads through the sources, and synthesizes everything into a thorough, well-cited Markdown answer. Think of it as having a research assistant that reads dozens of pages and writes you a report with footnotes.
 
-Two ways to run it: a Python script for the command line, or a Next.js web app you can deploy to Vercel.
+This repo includes two ways to use it: a Python script for the command line, and a Next.js web app you can deploy to Vercel.
 
-## Prerequisites
+## Quick start
 
-- A You.com API key — grab one at [you.com/platform](https://you.com/platform)
-
-## Python script
+### Python
 
 ```bash
-pip install -r requirements.txt
+pip install youdotcom
 export YDC_API_KEY="your-api-key-here"
 python research.py "What are the latest breakthroughs in quantum computing?"
 ```
 
-If you don't pass a question it uses a default one, so `python research.py` works too. Note: Research typically takes 10-30 seconds since it runs multiple searches and reads through sources.
+Three lines is all it takes:
 
-### Sample output
+```python
+from youdotcom import You
+
+you = You(api_key_auth="your-api-key")
+response = you.research(input="What are the latest breakthroughs in quantum computing?")
+print(response.output.content)
+```
+
+The response is a Markdown string with inline citations like `[1]`, `[2]`, plus a list of sources with URLs and titles.
+
+### Web app
+
+```bash
+cp .env.example .env.local    # add your API key
+npm install
+npm run dev                    # open localhost:3000
+```
+
+The web app calls the Research API server-side so your API key stays safe. It renders the Markdown answer with proper formatting and lists sources at the bottom.
+
+## Research effort levels
+
+The API supports four effort levels that control how deep the research goes:
+
+| Level | Speed | Description |
+|---|---|---|
+| `lite` | ~5s | Fast answers for straightforward questions |
+| `standard` | ~10-15s | Balanced speed and depth (default) |
+| `deep` | ~20-30s | Thorough research with cross-referencing |
+| `exhaustive` | ~30-60s | Most comprehensive, explores the topic fully |
+
+```python
+# quick answer
+response = you.research(input="what is RAG", research_effort="lite")
+
+# deep dive
+response = you.research(input="compare RAG architectures", research_effort="exhaustive")
+```
+
+The web app includes an effort level picker so you can see the difference in real time.
+
+## Response format
+
+The Research API returns a structured response:
+
+```json
+{
+  "output": {
+    "content": "## Quantum Computing Breakthroughs\n\nQuantum computing has seen several major advances... [1]\n\n...",
+    "content_type": "text",
+    "sources": [
+      {
+        "url": "https://blog.google/technology/research/google-willow-quantum-chip/",
+        "title": "Google Quantum AI — Willow Chip",
+        "snippets": ["Google's Willow chip demonstrated..."]
+      }
+    ]
+  }
+}
+```
+
+- `output.content` is a Markdown string with numbered inline citations (`[1]`, `[2]`, etc.)
+- `output.sources` is the list of web sources used, each with a URL, title, and relevant snippets
+
+## Sample output
 
 ```
 ## Recent Breakthroughs in Quantum Computing
@@ -33,61 +95,53 @@ Quantum computing has seen several major advances in recent years...
 increasing the number of qubits can actually reduce errors [1], a key
 threshold for practical quantum computing...
 
+Sources:
 [1] Google Quantum AI — Willow Chip
     https://blog.google/technology/research/google-willow-quantum-chip/
+[2] IBM Quantum — Heron Processor
+    https://www.ibm.com/quantum/blog/ibm-quantum-heron
 ```
-
-## Web app
-
-Set up your API key first:
-
-```bash
-cp .env.example .env.local
-# edit .env.local with your actual API key
-```
-
-Then install and run:
-
-```bash
-npm install
-npm run dev
-```
-
-Open [localhost:3000](http://localhost:3000), ask a question, and see the research answer with citations. The app calls the Research API server-side so your API key stays safe.
-
-### Deploy to Vercel
-
-1. Push this repo to GitHub
-2. Import it in [vercel.com/new](https://vercel.com/new)
-3. Add `YDC_API_KEY` as an environment variable
-4. Deploy
-
-Note: the Research API can take 30+ seconds to respond. Vercel's hobby plan has a 10-second function timeout, so you may need the Pro plan for reliable responses.
 
 ## When to use Research vs Search
 
 | | Search API | Research API |
 |---|---|---|
-| **Speed** | Fast (~1s) | Slower (10-30s) |
-| **Output** | List of web results (title, URL, snippet) | Comprehensive markdown answer with citations |
+| **Speed** | Fast (~1s) | Slower (5-60s depending on effort) |
+| **Output** | List of web results (title, URL, snippet) | Comprehensive Markdown answer with citations |
 | **Best for** | Quick lookups, building search UIs, RAG pipelines | Complex questions, report generation, deep analysis |
-| **Example** | "nextjs docs" | "how does next.js compare to remix for production apps" |
+| **Example query** | "nextjs docs" | "how does next.js compare to remix for production apps" |
 
 Use **Search** when you need raw results fast. Use **Research** when you need a synthesized, cited answer to a complex question.
 
-## How it works
+See the [Simple Search sample](https://github.com/youdotcom-oss/ydc-simple-search-sample) for a Search API example.
 
-Both the script and the web app do the same thing:
+## Deploy to Vercel
 
-1. Take a complex question
-2. Call the You.com Research API (Python SDK or REST API)
-3. Display the markdown answer and numbered sources
+1. Fork or push this repo to GitHub
+2. Import it at [vercel.com/new](https://vercel.com/new)
+3. Add `YDC_API_KEY` as an environment variable
+4. Deploy
 
-The web app adds a UI on top: question input, rendered markdown answer, and a sources list. The API route (`app/api/research/route.ts`) keeps your API key server-side.
+The Research API can take up to 60 seconds for exhaustive queries. The app sets `maxDuration = 60` on the API route, which requires Vercel Pro for timeouts beyond 10 seconds.
+
+## Project structure
+
+```
+research.py              # Python script — standalone CLI usage
+requirements.txt         # Python dependencies (just the SDK)
+app/
+  page.tsx               # React UI with effort picker, markdown rendering
+  layout.tsx             # Next.js root layout
+  api/research/route.ts  # Server-side API route (calls Research API via fetch)
+  globals.css            # Tailwind styles
+```
 
 ## Links
 
 - [You.com API docs](https://docs.you.com)
-- [Python SDK on PyPI](https://pypi.org/project/youdotcom/)
-- [TypeScript SDK on npm](https://www.npmjs.com/package/@youdotcom-oss/sdk)
+- [Research API reference](https://docs.you.com/api-reference/research)
+- [Python SDK](https://pypi.org/project/youdotcom/) (`pip install youdotcom`)
+- [TypeScript SDK](https://www.npmjs.com/package/@youdotcom-oss/sdk) (`npm install @youdotcom-oss/sdk`)
+- [Simple Search sample](https://github.com/youdotcom-oss/ydc-simple-search-sample)
 - [Get an API key](https://you.com/platform)
+- [Discord](https://discord.com/invite/youdotcom/)
