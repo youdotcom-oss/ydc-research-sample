@@ -28,8 +28,9 @@ const EFFORT_LEVELS = [
 
 type Effort = (typeof EFFORT_LEVELS)[number]["value"];
 
+const basePath = process.env.NEXT_PUBLIC_BASE_PATH || "";
+
 export default function Home() {
-  const basePath = process.env.NEXT_PUBLIC_BASE_PATH || "";
   const [apiKey, setApiKey] = useState("");
   const [showApiKey, setShowApiKey] = useState(false);
   const [query, setQuery] = useState("");
