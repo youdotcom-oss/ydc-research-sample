@@ -28,6 +28,8 @@ const EFFORT_LEVELS = [
 
 type Effort = (typeof EFFORT_LEVELS)[number]["value"];
 
+const basePath = process.env.NEXT_PUBLIC_BASE_PATH || "";
+
 export default function Home() {
   const [apiKey, setApiKey] = useState("");
   const [showApiKey, setShowApiKey] = useState(false);
@@ -55,7 +57,7 @@ export default function Home() {
     setSources([]);
 
     try {
-      const res = await fetch("/api/research", {
+      const res = await fetch(`${basePath}/api/research`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ input: q, research_effort: effort, apiKey: apiKey.trim() || undefined }),
