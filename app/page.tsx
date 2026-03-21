@@ -91,14 +91,14 @@ export default function Home() {
           className="flex items-center gap-[6px]"
         >
           <Image
-            src="/ydc-logo-icon.svg"
+            src={`${basePath}/ydc-logo-icon.svg`}
             alt=""
             width={22}
             height={22}
             aria-hidden
           />
           <Image
-            src="/ydc-logo-text.svg"
+            src={`${basePath}/ydc-logo-text.svg`}
             alt="you.com"
             width={76}
             height={15}
