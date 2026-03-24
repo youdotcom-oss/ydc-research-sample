@@ -1,6 +1,6 @@
 # Research
 
-**[Live demo →](https://ydc-research-sample.vercel.app/)**
+**[Live demo →](https://you.com/examples/research)**
 
 Ask a complex question, get a comprehensive cited answer from the [You.com Research API](https://docs.you.com/api-reference/research/v1-research).
 
